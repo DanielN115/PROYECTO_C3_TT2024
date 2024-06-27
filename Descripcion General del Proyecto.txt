@@ -1,0 +1,7 @@
+Proyecto Pomodoro
+
+Descripción.
+En este proyecto de desea realizar la propuesta de trabajo final de Talento Tech relacionada con la técnica pomodoro.
+
+Objetivo.
+Mejorar la concentración de la persona destinada del software.
