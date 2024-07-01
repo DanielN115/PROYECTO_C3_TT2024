@@ -17,11 +17,13 @@ reps = 0
 reps_final = 0
 timer = 0
 check_marks_list = []
+paused = False
+remaining_time = 0
 
 # ---------------------------- TIMER RESET ------------------------------- # 
 
 def reset_timer(): # Deja los labels en defecfto, borra las marcas
-    global reps
+    global reps, reps_final
     window.after_cancel(timer)
     timer_label.config(text="00:00")
     title_label.config(text="Timer", fg=GREEN)
@@ -39,35 +41,53 @@ def clear_check_marks(): # Metodo para borrar las marcas tanto en la lista como 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 
 def start_timer():
-    global reps
-    print(reps)
+    global reps, reps_final
+    #print(reps)
+    
     if timer:
         window.after_cancel(timer)  # Cancela el temporizador anterior
         
     # Si es un descanso largo, limpia las marcas de verificación
     if reps % 8 == 0:
         clear_check_marks()
+    elif reps == 0:
+        reps_final = 0
     reps += 1
+    works = reps + 1 
     
     work_sec = int(WORK_MIN * 60)  # El metodo int nos asegura que si nos da un float no aparesca la parte decimal
     short_break_sec = int(SHORT_BREAK_MIN * 60)
     long_break_sec = int(LONG_BREAK_MIN * 60)
 
-    if reps % 8 == 0 and reps > 0:  # Limpiar marcas de verificación antes de un descanso largo
-        count_down(long_break_sec)
-        title_label.config(text="Long Break", fg=RED, font=(FONT_NAME, 50))
-    elif reps % 2 == 0:  # todas las repeticiones pares son descansos
-        count_down(short_break_sec)
-        title_label.config(text="Break", fg=PINK, font=(FONT_NAME, 50))
-    else:  # si no es descanso entonces es para trabajo
-        count_down(work_sec)
-        title_label.config(text="Work", fg=GREEN, font=(FONT_NAME, 50))
+    if reps <= 8:
+        if reps % 8 == 0 and reps > 0:  # Limpiar marcas de verificación antes de un descanso largo
+            count_down(long_break_sec)
+            title_label.config(text="Long Break", fg=RED, font=(FONT_NAME, 50))
+        elif reps % 2 == 0:  # todas las repeticiones pares son descansos
+            count_down(short_break_sec)
+            title_label.config(text=f"Break {works // 2}", fg=PINK, font=(FONT_NAME, 50))
+        else:  # si no es descanso entonces es para trabajo
+            count_down(work_sec)
+            title_label.config(text=f"Work {works // 2}", fg=GREEN, font=(FONT_NAME, 50))
+    else: 
+        save_sesion()
 
-
+def pause_timer():
+    global paused, timer
+    if reps != 0:
+        if paused:
+            count_down(remaining_time)
+            paused = False
+            pause_button.config(text="PAUSE")
+        else:
+            window.after_cancel(timer)
+            paused = True
+            pause_button.config(text="RESUME")
+        
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
 
-
 def count_down(count):
+    global remaining_time
     count_min = math.floor(count / 60)  # Calcula los minutos restantes del tiempo y los redondea
     count_sec = count % 60  # calcula los segundos restantes
     
@@ -80,16 +100,18 @@ def count_down(count):
     if count > 0:
         global timer
         timer = window.after(1000, count_down, count - 1)
+        remaining_time = count
     else:
         global reps, reps_final
         if reps % 8 == 0:
-            reset_timer()
             save_sesion()
         else:
-            reps_final += 1
-            if reps % 2 == 0:
+            if reps % 2 != 0:
+                reps_final += 1
                 update_check_marks()
             start_timer()  # Reinicia el temporizador cuando llega a 00:00
+            
+# ---------------------------- CHECKMARKS MECHANISM ------------------------------- #
 
 def update_check_marks():
     global reps
@@ -99,54 +121,62 @@ def update_check_marks():
           
 def save_sesion():
     global reps_final, check_marks_list, reps
-    reset_timer()
-    title_label.config(text="SESIÓN COMPLETA", fg=GREEN, font=(FONT_NAME, 40))
-    timer_label.config(text="00:00")
-    
-    print(reps_final)
-    print(reps)
-    print(check_marks_frame)
-    print(check_marks_list)
+    if reps != 0: 
+        reset_timer()
+        title_label.config(text="SESIÓN COMPLETA", fg=GREEN, font=(FONT_NAME, 40))
+        timer_label.config(text="00:00")
         
-    for i in range(math.floor((reps_final+1)/2)):
-        check_img_label = Label(check_marks_frame, image=tomato_check_img, bg=BLUE)
-        check_img_label.pack(side=LEFT, padx=5)
-        check_marks_list.append(check_img_label)
-    reps_final = 0
+        #print(reps_final, reps)        
+        
+        for i in range(math.floor(reps_final)):
+            check_img_label = Label(check_marks_frame, image=tomato_check_img, bg=BLUE)
+            check_img_label.pack(side=LEFT, padx=5)
+            check_marks_list.append(check_img_label)
+        reps_final = 0
 
 # ---------------------------- UI SETUP ------------------------------- #
 
-# Crea la ventana principal
+# Ventana principal
 window = Tk()
 window.title("Pomodoro")
 window.config(padx=20, pady=10, bg=BLUE)
 window.geometry("650x700")
 window.resizable(width=False, height=False)
 
-# Crea el título
+# Título
 title_label = Label(text="Timer", fg=GREEN, bg=BLUE, font=(FONT_NAME, 50))
 title_label.grid(column=1, row=0, pady=(0, 10))
 
-# Crea un label para la imagen 
+# Label para la imagen 
 tomato_img = PhotoImage(file="img/icon_Pomodoro.png")  # imagen principal
 tomato_check_img = PhotoImage(file="img/icon_Pomodoro2.png")  # imagen que remplaza los checks
 icon_label = Label(image=tomato_img, bg=BLUE)
 icon_label.grid(column=1, row=1, pady=(0, 10))
 
-# Crea un label para el temporizador
+# Label para el temporizador
 timer_label = Label(text="00:00", fg="white", bg=RED, font=(FONT_NAME, 80, "bold"))
 timer_label.grid(column=1, row=1, pady=(0, 10))
 
-# Crea botones de start y reset
-start_button = Button(text="Start", highlightthickness=0, command=start_timer)
-start_button.grid(column=0, row=2)
+# Frame para los botones
+buttons_frame = Frame(window, bg=BLUE)
+buttons_frame.grid(column=1, row=3, pady=(10, 0))
 
-reset_button = Button(text="Reset", highlightthickness=0, command=reset_timer)
-reset_button.grid(column=2, row=2)
+# Botones del frame de botones
+start_button = Button(buttons_frame, text="START", highlightthickness=0, command=start_timer)
+start_button.pack(side=LEFT, padx=20)
 
-# Crea un frame para las marcas de verificación de pomodoro
+reset_button = Button(buttons_frame, text="RESET", highlightthickness=0, command=reset_timer)
+reset_button.pack(side=LEFT, padx=20)
+
+pause_button = Button(buttons_frame, text="PAUSE", highlightthickness=0, command=pause_timer)
+pause_button.pack(side=LEFT, padx=20)
+
+finish_button = Button(buttons_frame, text="FINISH", highlightthickness=0, command=save_sesion)
+finish_button.pack(side=LEFT, padx=20)
+
+# Frame para las marcas de verificación de pomodoro
 check_marks_frame = Frame(window, bg=BLUE)
-check_marks_frame.grid(column=1, row=3)
+check_marks_frame.grid(column=1, row=4)
 
 # Inicia el loop principal de la ventana
 window.mainloop()
