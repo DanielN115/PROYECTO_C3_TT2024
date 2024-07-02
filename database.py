@@ -38,6 +38,23 @@ def save_to_database(reps_final):
     cursor.close()
     conn.close()
     
+def show_history_db():
+    # Conectarse a la base de datos y recuperar datos
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    db_config = {
+        'host': config['database']['host'],
+        'user': config['database']['user'],
+        'password': config['database']['password'],
+        'database': config['database']['database']
+    }
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM sessions")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+    
 def main():
     pass
 
