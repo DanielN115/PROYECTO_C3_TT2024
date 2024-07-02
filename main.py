@@ -1,5 +1,6 @@
 from tkinter import *
 import math
+import database as db
 
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
@@ -20,6 +21,11 @@ check_marks_list = []
 paused = False
 remaining_time = 0
 
+# ---------------------------- DATABASE ------------------------------- # 
+try:
+    db.setup_database()
+except:
+    print("Conexion fallida")
 # ---------------------------- TIMER RESET ------------------------------- # 
 
 def reset_timer(): # Deja los labels en defecfto, borra las marcas
@@ -119,9 +125,16 @@ def update_check_marks():
     check_img_label.pack(side=LEFT, padx=5)
     check_marks_list.append(check_img_label)
           
+
+# ---------------------------- SAVE IN DATABASE ------------------------------- #
 def save_sesion():
     global reps_final, check_marks_list, reps
     if reps != 0: 
+        try:
+            db.save_to_database(reps_final) # Guarda la sesión en la base de datos
+        except:
+            print("Conexion fallida")
+        
         reset_timer()
         title_label.config(text="SESIÓN COMPLETA", fg=GREEN, font=(FONT_NAME, 40))
         timer_label.config(text="00:00")
@@ -133,6 +146,7 @@ def save_sesion():
             check_img_label.pack(side=LEFT, padx=5)
             check_marks_list.append(check_img_label)
         reps_final = 0
+
 
 # ---------------------------- UI SETUP ------------------------------- #
 
