@@ -17,9 +17,9 @@ BLUE = "#2686ac"
 BLUE_LIGHT = "#2071b3"
 FONT_NAME = "Aptos (Cuerpo)"
 
-WORK_MIN = 1/20 #25 minutos, cuando termina se considera 1 pomodoro
-SHORT_BREAK_MIN = 1/15 #5 minutos
-LONG_BREAK_MIN = 1/20 #15 a 30 minutos, solo cuando se hagan 4 pomodoros
+WORK_MIN = 25 #25 minutos, cuando termina se considera 1 pomodoro
+SHORT_BREAK_MIN = 5 #5 minutos
+LONG_BREAK_MIN = 30 #15 a 30 minutos, solo cuando se hagan 4 pomodoros
 
 reps = 0
 reps_final = 0
