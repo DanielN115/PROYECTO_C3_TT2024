@@ -13,7 +13,7 @@ RED = "#fe0000"
 RED_LIGHT = "#ff5232"
 GREEN = "#9bdeac"
 YELLOW = "#f7f5dd"
-BLUE = "#2686ac"
+BLUE = "#332f2c"
 BLUE_LIGHT = "#2071b3"
 FONT_NAME = "Aptos (Cuerpo)"
 
@@ -234,13 +234,18 @@ title_label.grid(column=1, row=0, pady=(0, 10))
 
 # Label para la imagen 
 tomato_img = PhotoImage(file="img/icon_Pomodoro.png")  # imagen principal
-tomato_check_img = PhotoImage(file="img/icon_Pomodoro2.png")  # imagen que remplaza los checks
+tomato_check_img = PhotoImage(file="img/icon_Pomodoro2.png") 
 icon_label = Label(image=tomato_img, bg=BLUE)
 icon_label.grid(column=1, row=1, pady=(0, 10))
 
 # Label para el temporizador
-timer_label = Label(text="00:00", fg="white", bg=RED, font=(FONT_NAME, 80, "bold"))
+timer_label = Label(text="00:00", fg="white", bg=RED, font=(FONT_NAME, 100, "bold"))
 timer_label.grid(column=1, row=1, pady=(0, 10))
+
+# Imagen TalentoTech
+logo_TalentoTech = PhotoImage(file="img/logo_TalentoTech.png")
+icon_TalentoTech = Label(window, image=logo_TalentoTech, bg=RED)
+icon_TalentoTech.place(x=160, y=420)
 
 # Frame para los botones
 buttons_frame = Frame(window, bg=BLUE)
