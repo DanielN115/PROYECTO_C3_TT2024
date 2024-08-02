@@ -32,8 +32,8 @@ remaining_time = 0
 try:
     db.setup_database()
 except:
-    pass
-    #messagebox.showerror("Error", "Conexión fallida a la base de datos")
+    #pass
+    messagebox.showerror("Error", "Conexión fallida a la base de datos")
 # ---------------------------- TIMER RESET ------------------------------- # 
 
 def reset_timer(): # Deja los labels en defecfto, borra las marcas
